@@ -1,0 +1,80 @@
+apply plugin: 'android-sdk-manager'
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+task askForPasswords << {
+    android.signingConfigs.release.storeFile = file(STORE)
+    android.signingConfigs.release.keyAlias = ALIAS
+    android.signingConfigs.release.storePassword = STORE_PASSWORD
+    android.signingConfigs.release.keyPassword = KEY_PASSWORD
+    if (android.signingConfigs.release.storePassword == null) {
+        android.signingConfigs.release.storePassword = new String(System.console().readPassword('\n\nKeystore ' + android.signingConfigs.release.storeFile + ' password: '))
+    }
+    if (android.signingConfigs.release.keyPassword == null) {
+        android.signingConfigs.release.keyPassword = new String(System.console().readPassword('\nKey ' + android.signingConfigs.release.keyAlias + ' password: '))
+    }
+}
+
+tasks.withType(com.android.build.gradle.tasks.PackageApplication).whenTaskAdded { task ->
+    if (!task.name.endsWith('Debug') && !task.name.endsWith('Test')) {
+        task.dependsOn 'askForPasswords'
+    }
+}
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion '22.0.0'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    def Properties versionProps = new Properties()
+    versionProps.load(new FileInputStream(file('version.properties')))
+    def code = System.getenv().BUILD_NUMBER ?: versionProps['code']
+    defaultConfig {
+        applicationId 'fi.reaktor.android.rx'
+        minSdkVersion 21
+        targetSdkVersion 22
+        versionName versionProps['name']
+    }
+    signingConfigs {
+        release {
+            storeFile file('/dev/null')
+            storePassword ''
+            keyAlias ''
+            keyPassword ''
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix ' debug'
+        }
+
+        release {
+            debuggable false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources false
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile 'com.googlecode.totallylazy:totallylazy:1.64'
+    compile 'io.reactivex:rxandroid:0.24.0'
+    compile 'com.squareup.okhttp:okhttp:2.2.0'
+    compile 'com.squareup.okio:okio:1.1.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
+}
