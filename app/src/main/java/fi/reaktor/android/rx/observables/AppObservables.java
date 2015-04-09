@@ -34,13 +34,9 @@ public class AppObservables {
     }
 
     public static Observable<String> doWhenSearching(Observable<String> input, Action1<String> action) {
-
-        /*
-          Create an observable from which executes given action in Android main thread when input events item.
-          This is very straightforward task, just make sure observing is done in main thread and then do something on each item.
-         */
-        // TODO replace with your solution, this observable never emits anything
-        return Observable.never();
+        return input
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(action);
     }
 
     public static Observable<ImageSearch.ImageSearchResponse> pictures(Observable<String> inputs, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
