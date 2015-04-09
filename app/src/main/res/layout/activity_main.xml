@@ -16,15 +16,6 @@
         android:inputType="textNoSuggestions"
         android:layout_margin="10dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:id="@+id/enteredText"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/searchTerm" />
-    <!--
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,6 +25,5 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true" />
-        -->
 </RelativeLayout>
 
