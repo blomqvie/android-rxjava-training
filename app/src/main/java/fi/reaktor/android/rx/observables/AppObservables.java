@@ -17,6 +17,7 @@ import fi.reaktor.android.rx.json.ImageSearch;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.android.widget.WidgetObservable;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -30,6 +31,16 @@ public class AppObservables {
                 .debounce(1, TimeUnit.SECONDS)
                 .map(e -> e.text().toString())
                 .filter(text -> text.length() > 3);
+    }
+
+    public static Observable<String> doWhenSearching(Observable<String> input, Action1<String> action) {
+
+        /*
+          Create an observable from which executes given action in Android main thread when input events item.
+          This is very straightforward task, just make sure observing is done in main thread and then do something on each item.
+         */
+        // TODO replace with your solution, this observable never emits anything
+        return Observable.never();
     }
 
     public static Observable<ImageSearch.ImageSearchResponse> pictures(Observable<String> inputs, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
