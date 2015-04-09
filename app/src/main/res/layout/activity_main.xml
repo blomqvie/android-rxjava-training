@@ -12,7 +12,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:hint="Enter search term here" />
+        android:hint="Enter search term here"
+        android:layout_margin="10dp"/>
 
     <ListView
         android:layout_width="wrap_content"
