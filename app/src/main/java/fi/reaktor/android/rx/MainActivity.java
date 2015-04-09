@@ -40,6 +40,9 @@ public class MainActivity extends Activity {
         Observable<String> inputs = AppObservables.inputs(searchTerm);
         // show progress bar when a new valid input is emitted from inputs
         searchActionSubscription = AppObservables.doWhenSearching(inputs, showProgressBar).subscribe();
+        // XXX: this subscription will die on first error, for example missing network.
+        // This should be improved e.g. by subscribing again in errorHandler
+        // or using RxJava error handlers: https://github.com/ReactiveX/RxJava/wiki/Error-Handling-Operators
         picturesSubscription = AppObservables.pictures(inputs, okHttpClient, objectMapper).subscribe(resultHandler, errorHandler);
     }
 

@@ -41,7 +41,7 @@ public class ImageListAdapter extends BaseAdapter {
         if(view == null) {
             view = new ImageView(context);
         }
-        // TODO use placeholder to avoid glitch
+        // XXX: a placeholder should be used to avoid glitch in UI when loading images.
         Picasso.with(context).load(getItem(position)).into(view);
         return view;
     }
