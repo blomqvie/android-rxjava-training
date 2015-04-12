@@ -4,13 +4,13 @@ A small sample app for learning RxJava usage in Android.
 
 ## Get started
 
-This application is divided into 3 tasks to implement Google image search with RxJava. HEAD commit contains all solutions, so please don't look at the code right away :)
+This application is divided into 3 tasks, aimed to implement Google image search with RxJava. HEAD commit contains all solutions, so please don't look at the code right away :)
 
 ### Input handling
 
 Start by checking out the first task: `git checkout bcff30`
 
-Implement `input` function in `AppObservable` following instructions in code.
+Implement `input` function in `AppObservables` class following instructions in code. Once you're done, you should see you input reflected to a view below the text field.
 
 You can check out the solution by checking out commit fd03d1
 
@@ -20,7 +20,7 @@ This is probably the most difficult task in this exercise. It goes a bit deeper 
 
 To start, checkout out commit 7c5a35
 
-The goal is again to implement a function in `AppObservable` - this time it's called `pictures`
+The goal is again to implement a function in `AppObservables` - this time it's called `pictures`. As a result, you should see a list of pictures based on entered input which updates when input changes.
 
 If the instructions are not clear enough or the task feels too difficult, solutions can be found in commit c62fb7.
 
