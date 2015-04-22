@@ -36,13 +36,6 @@ public class AppObservables {
                 .filter(text -> text.length() > 3);
     }
 
-    public static Observable<String> invalidInputs(TextView textView) {
-        return WidgetObservable.text(textView, true)
-                .debounce(100, TimeUnit.MILLISECONDS)
-                .map(e -> e.text().toString())
-                .filter(text -> text.length() <= 3);
-    }
-
     public static Observable<String> doWhenSearching(Observable<String> input, Action1<String> action) {
         return input
                 .observeOn(AndroidSchedulers.mainThread())

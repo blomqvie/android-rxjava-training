@@ -16,9 +16,8 @@ import fi.reaktor.android.rx.jackson.deser.TotallylazyModule;
 import fi.reaktor.android.rx.json.ImageSearch;
 import fi.reaktor.android.rx.observables.AppObservables;
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
+import rx.android.widget.WidgetObservable;
 import rx.functions.Action1;
 
 public class MainActivity extends Activity {
@@ -27,7 +26,7 @@ public class MainActivity extends Activity {
     private ObjectMapper objectMapper = new ObjectMapper();
     private Subscription picturesSubscription;
     private Subscription searchActionSubscription;
-    private Subscription invalidInputsSubscription;
+    private Subscription editingSearchTermBegunSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +48,6 @@ public class MainActivity extends Activity {
         // This should be improved e.g. by subscribing again in errorHandler
         // or using RxJava error handlers: https://github.com/ReactiveX/RxJava/wiki/Error-Handling-Operators
         picturesSubscription = AppObservables.pictures(inputs, okHttpClient, objectMapper).subscribe(resultHandler, errorHandler);
-
-        invalidInputsSubscription = AppObservables.invalidInputs(searchTerm).observeOn(AndroidSchedulers.mainThread()).subscribe(term -> {
-            ListView resultList = (ListView) findViewById(R.id.results);
-            resultList.setAlpha(0.3f);
-        });
     }
 
     // shows progressbar when new search starts
@@ -62,8 +56,15 @@ public class MainActivity extends Activity {
 
     // takes results of image search and creates adapter for listview based on the result
     private Action1<ImageSearch.ImageSearchResponse> resultHandler = parsed -> {
-        ListView resultList = (ListView) findViewById(R.id.results);
+        final ListView resultList = (ListView) findViewById(R.id.results);
+
+        TextView searchTerm = (TextView) findViewById(R.id.searchTerm);
+        editingSearchTermBegunSubscription = WidgetObservable.text(searchTerm, false).take(1).subscribe(_a -> {
+            resultList.setAlpha(0.3f);
+            editingSearchTermBegunSubscription.unsubscribe();
+        });
         resultList.setAlpha(1.0f);
+
         List<String> urlList = parsed.responseData.results.map(i -> i.url).toList();
         resultList.setAdapter(new ImageListAdapter(urlList, this));
         // hide progress bar when search completes
@@ -77,7 +78,9 @@ public class MainActivity extends Activity {
     protected void onPause() {
         picturesSubscription.unsubscribe();
         searchActionSubscription.unsubscribe();
-        invalidInputsSubscription.unsubscribe();
+        if (!editingSearchTermBegunSubscription.isUnsubscribed()) {
+            editingSearchTermBegunSubscription.unsubscribe();
+        }
         super.onPause();
     }
 }
