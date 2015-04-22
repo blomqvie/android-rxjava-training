@@ -17,16 +17,17 @@ import fi.reaktor.android.rx.json.ImageSearch;
 import fi.reaktor.android.rx.observables.AppObservables;
 import rx.Observable;
 import rx.Subscription;
+import rx.android.app.AppObservable;
 import rx.android.widget.WidgetObservable;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends Activity {
 
     private OkHttpClient okHttpClient = new OkHttpClient();
     private ObjectMapper objectMapper = new ObjectMapper();
-    private Subscription picturesSubscription;
-    private Subscription searchActionSubscription;
-    private Subscription editingSearchTermBegunSubscription;
+    private CompositeSubscription compositeSubscription;
+    private Subscription alphaSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +41,14 @@ public class MainActivity extends Activity {
         super.onResume();
         TextView searchTerm = (TextView) findViewById(R.id.searchTerm);
         Observable<String> inputs = AppObservables.inputs(searchTerm);
-
+        compositeSubscription = new CompositeSubscription();
         // show progress bar when a new valid input is emitted from inputs
-        searchActionSubscription = AppObservables.doWhenSearching(inputs, showProgressBar).subscribe();
+        compositeSubscription.add(AppObservable.bindActivity(this, AppObservables.doWhenSearching(inputs, showProgressBar)).subscribe());
 
-        // XXX: this subscription will die on first error, for example missing network.
+        // TODO: this subscription will die on first error, for example missing network.
         // This should be improved e.g. by subscribing again in errorHandler
         // or using RxJava error handlers: https://github.com/ReactiveX/RxJava/wiki/Error-Handling-Operators
-        picturesSubscription = AppObservables.pictures(inputs, okHttpClient, objectMapper).subscribe(resultHandler, errorHandler);
+        compositeSubscription.add(AppObservable.bindActivity(this, AppObservables.pictures(inputs, okHttpClient, objectMapper)).subscribe(resultHandler, errorHandler));
     }
 
     // shows progressbar when new search starts
@@ -59,11 +60,11 @@ public class MainActivity extends Activity {
         final ListView resultList = (ListView) findViewById(R.id.results);
 
         TextView searchTerm = (TextView) findViewById(R.id.searchTerm);
-        editingSearchTermBegunSubscription = WidgetObservable.text(searchTerm, false).take(1).subscribe(_a -> {
-            resultList.setAlpha(0.3f);
-            editingSearchTermBegunSubscription.unsubscribe();
-        });
         resultList.setAlpha(1.0f);
+
+        alphaSubscription = AppObservable.bindActivity(this, WidgetObservable.text(searchTerm, false).take(1)).subscribe(_a -> {
+            resultList.setAlpha(0.3f);
+        });
 
         List<String> urlList = parsed.responseData.results.map(i -> i.url).toList();
         resultList.setAdapter(new ImageListAdapter(urlList, this));
@@ -76,10 +77,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        picturesSubscription.unsubscribe();
-        searchActionSubscription.unsubscribe();
-        if (!editingSearchTermBegunSubscription.isUnsubscribed()) {
-            editingSearchTermBegunSubscription.unsubscribe();
+        compositeSubscription.unsubscribe();
+        if(alphaSubscription != null) {
+            alphaSubscription.unsubscribe();
         }
         super.onPause();
     }
