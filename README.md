@@ -32,4 +32,8 @@ Checkout commit 9fc8357 and implement `AppObservables.doWhenSearching` and you s
 
 Solution can be found in commit 6f80141
 
+### UI feedback
+
+The absolute final last task is also easy and straightforward. Since we're not firing off image searches for search terms that are too short, we'd like to indicate to the user that while they modify the search term and it's too short the search results on the screen are visually "grayed out" to indicate that the images on the screen are not for the current (invalid) search term.
+
 Have fun!

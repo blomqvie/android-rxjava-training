@@ -19,6 +19,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.android.widget.WidgetObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.observers.Observers;
+import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 
@@ -31,6 +34,11 @@ public class AppObservables {
                 .debounce(1, TimeUnit.SECONDS)
                 .map(e -> e.text().toString())
                 .filter(text -> text.length() > 3);
+    }
+
+    public static Observable<String> invalidInputs(TextView textView) {
+        // TODO: Let's expose an Observable for _invalid_ inputs so that the UI can indicate it somehow
+        return Observable.just("");
     }
 
     public static Observable<String> doWhenSearching(Observable<String> input, Action1<String> action) {

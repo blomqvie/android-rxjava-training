@@ -38,12 +38,18 @@ public class MainActivity extends Activity {
         super.onResume();
         TextView searchTerm = (TextView) findViewById(R.id.searchTerm);
         Observable<String> inputs = AppObservables.inputs(searchTerm);
+
         // show progress bar when a new valid input is emitted from inputs
         searchActionSubscription = AppObservables.doWhenSearching(inputs, showProgressBar).subscribe();
+
         // XXX: this subscription will die on first error, for example missing network.
         // This should be improved e.g. by subscribing again in errorHandler
         // or using RxJava error handlers: https://github.com/ReactiveX/RxJava/wiki/Error-Handling-Operators
         picturesSubscription = AppObservables.pictures(inputs, okHttpClient, objectMapper).subscribe(resultHandler, errorHandler);
+
+        // TODO: When searchTerm is "invalid" (e.g. too short) set the ListView's alpha to 30%
+        // to indicate that the results on the screen are not current with the search term
+
     }
 
     // shows progressbar when new search starts
@@ -66,6 +72,8 @@ public class MainActivity extends Activity {
     protected void onPause() {
         picturesSubscription.unsubscribe();
         searchActionSubscription.unsubscribe();
+        // TODO: Remember to unsubscribe from _all_ observables we've subscribed to...
+
         super.onPause();
     }
 }
