@@ -16,7 +16,9 @@ import fi.reaktor.android.rx.jackson.deser.TotallylazyModule;
 import fi.reaktor.android.rx.json.ImageSearch;
 import fi.reaktor.android.rx.observables.AppObservables;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 public class MainActivity extends Activity {
@@ -25,6 +27,7 @@ public class MainActivity extends Activity {
     private ObjectMapper objectMapper = new ObjectMapper();
     private Subscription picturesSubscription;
     private Subscription searchActionSubscription;
+    private Subscription invalidInputsSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +50,10 @@ public class MainActivity extends Activity {
         // or using RxJava error handlers: https://github.com/ReactiveX/RxJava/wiki/Error-Handling-Operators
         picturesSubscription = AppObservables.pictures(inputs, okHttpClient, objectMapper).subscribe(resultHandler, errorHandler);
 
-        // TODO: When searchTerm is "invalid" (e.g. too short) set the ListView's alpha to 30%
-        // to indicate that the results on the screen are not current with the search term
-
+        invalidInputsSubscription = AppObservables.invalidInputs(searchTerm).observeOn(AndroidSchedulers.mainThread()).subscribe(term -> {
+            ListView resultList = (ListView) findViewById(R.id.results);
+            resultList.setAlpha(0.3f);
+        });
     }
 
     // shows progressbar when new search starts
@@ -59,6 +63,7 @@ public class MainActivity extends Activity {
     // takes results of image search and creates adapter for listview based on the result
     private Action1<ImageSearch.ImageSearchResponse> resultHandler = parsed -> {
         ListView resultList = (ListView) findViewById(R.id.results);
+        resultList.setAlpha(1.0f);
         List<String> urlList = parsed.responseData.results.map(i -> i.url).toList();
         resultList.setAdapter(new ImageListAdapter(urlList, this));
         // hide progress bar when search completes
@@ -72,8 +77,7 @@ public class MainActivity extends Activity {
     protected void onPause() {
         picturesSubscription.unsubscribe();
         searchActionSubscription.unsubscribe();
-        // TODO: Remember to unsubscribe from _all_ observables we've subscribed to...
-
+        invalidInputsSubscription.unsubscribe();
         super.onPause();
     }
 }

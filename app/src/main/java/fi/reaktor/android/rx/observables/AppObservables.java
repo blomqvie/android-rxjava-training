@@ -37,8 +37,10 @@ public class AppObservables {
     }
 
     public static Observable<String> invalidInputs(TextView textView) {
-        // TODO: Let's expose an Observable for _invalid_ inputs so that the UI can indicate it somehow
-        return Observable.just("");
+        return WidgetObservable.text(textView, true)
+                .debounce(100, TimeUnit.MILLISECONDS)
+                .map(e -> e.text().toString())
+                .filter(text -> text.length() <= 3);
     }
 
     public static Observable<String> doWhenSearching(Observable<String> input, Action1<String> action) {
