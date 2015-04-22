@@ -42,8 +42,7 @@ public class AppObservables {
     public static Observable<ImageSearch.ImageSearchResponse> pictures(Observable<String> inputs, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
         return inputs.map(createFullUrl)
                 .switchMap(url -> OkHttpObservable.createObservable(okHttpClient, new Request.Builder().url(url).get().build()))
-                .flatMap(resp -> JacksonObservable.createObservable(objectMapper, resp.body().byteStream(), new TypeReference<ImageSearch.ImageSearchResponse>() {
-                }))
+                .flatMap(resp -> JacksonObservable.createObservable(objectMapper, resp.body().byteStream(), ImageSearch.ImageSearchResponse.class))
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
