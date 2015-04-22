@@ -8,28 +8,28 @@ This application is divided into 3 tasks, aimed to implement Google image search
 
 ### Input handling
 
-Start by checking out the first task: `git checkout bcff30`
+Start by checking out the first task: `git checkout 95f5719`
 
 Implement `input` function in `AppObservables` class following instructions in code. Once you're done, you should see you input reflected to a view below the text field.
 
-You can check out the solution by checking out commit fd03d1
+You can check out the solution by checking out commit f3aa31c
 
 ### Networking and response parsing
 
 This is probably the most difficult task in this exercise. It goes a bit deeper into RxJava and utilizes more advanced features.
 
-To start, checkout out commit 7c5a35
+To start, checkout out commit c0720c0
 
 The goal is again to implement a function in `AppObservables` - this time it's called `pictures`. As a result, you should see a list of pictures based on entered input which updates when input changes.
 
-If the instructions are not clear enough or the task feels too difficult, solutions can be found in commit c62fb7.
+If the instructions are not clear enough or the task feels too difficult, solutions can be found in commit 5de7492
 
 ### Side-effects in action
 
 Last task is easy and straightforward. The goal is to create more side effects to UI by showing progress bar when image search is ongoing.
 
-Checkout commit 3dbfe0 and implement `AppObservables.doWhenSearching` and you should have progress bar spinning during networking!
+Checkout commit 9fc8357 and implement `AppObservables.doWhenSearching` and you should have progress bar spinning during networking!
 
-Solution can be found in commit fb7194
+Solution can be found in commit 6f80141
 
 Have fun!
